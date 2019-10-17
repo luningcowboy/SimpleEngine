@@ -1,0 +1,15 @@
+" Press <F1> for help
+
+-[F]js-engine {
+ |-[F]images {
+ | |-b1.png }
+ |
+ |-[F]libs {
+ | |-pixi.min.js }
+ |
+ |-game.js
+ |-gs.js
+ |-index.html
+ |-jsengine.exvim }
+
+
