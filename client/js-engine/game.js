@@ -1,13 +1,14 @@
 console.log("Load game.js start");
 class MoveComponent{
-	constructor(mx, my){
+	constructor(mx, my, renderComponent){
 		this._mx = mx;
 		this._my = my;
+		this._cmp = renderComponent;
 	}
 	update(obj){
-		console.log('MoveComponent');
-		obj.x += this._mx;
-		obj.y += this._my;
+		obj.debug('MoveComponent','update');
+		this._cmp.x += this._mx;
+		this._cmp.y += this._my;
 	}
 }
 class GameObjectBG extends GS.GameObject {
@@ -17,8 +18,10 @@ class GameObjectBG extends GS.GameObject {
 		this.y = 100;
 		this.width = 100;
 		this.height = 100;
-		this.addComponent(new GS.SpriteComponent('./images/b1.png', this));
-		this.addComponent(new MoveComponent(1, 1));
+		this.addRenderRoot();
+		let sp = new GS.SpriteComponent('./images/b1.png', this.getRenderRoot())
+		this.addRenderComponent(sp);
+		this.addComponent(new MoveComponent(1, 1, sp));
 	}
 }
 // 开始游戏逻辑
