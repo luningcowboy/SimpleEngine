@@ -126,13 +126,14 @@ setlocal winfixheight
 setlocal winfixwidth
 setlocal nowrap
 setlocal wrapmargin=0
-let s:l = 9 - ((8 * winheight(0) + 16) / 32)
+3
+normal! zo
+let s:l = 13 - ((12 * winheight(0) + 16) / 32)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-9
-normal! 0
+13
+normal! 04|
 let &so = s:so_save | let &siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 " vim: set ft=vim :

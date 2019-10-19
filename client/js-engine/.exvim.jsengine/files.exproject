@@ -5,9 +5,11 @@
  | |-b1.png }
  |
  |-[F]libs {
+ | |-moment.js
  | |-pixi.min.js }
  |
  |-game.js
+ |-gobang.js
  |-gs.js
  |-index.html
  |-jsengine.exvim }

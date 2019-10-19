@@ -33,7 +33,6 @@ class ServiceCenter{
 	 >> LogService.debug(['111','22222'])
 	*/
 	doService(key, params){
-		console.log('doService', key);
 		let keys = key.split('.');
 		let id = keys[0];
 		let service = this.getService(id);
@@ -140,6 +139,7 @@ class ComponentRenderRoot{
 		this.root.scale.x = this.scale.x;
 		this.root.scale.y = this.scale.y;
 		//TODO: pixi.Container 没有anchor属性
+		this.root.setAnchor(0.5);
 		//this.root.anchor.x = this.anchor.x;
 		//this.root.anchor.y = this.anchor.y;
 	}
@@ -320,7 +320,8 @@ class Engine{
 
 window.GS = {};
 GS.Component = Component;
-GS.SpriteComponent = SpriteComponent;
+GS.ComponentSprite = SpriteComponent;
+GS.ComponentRenderRoot = ComponentRenderRoot;
 GS.GameObject = GameObject;
 GS.Event = Event;
 
