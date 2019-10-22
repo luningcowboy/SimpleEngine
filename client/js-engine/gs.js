@@ -31,7 +31,7 @@ class ServiceCenter{
 	 *eg:
 	 doServie('log.debug',['111','2222'])
 	 >> LogService.debug(['111','22222'])
-	*/
+	 */
 	doService(key, params){
 		let keys = key.split('.');
 		let id = keys[0];
@@ -82,7 +82,8 @@ class LogService extends BaseService{
 		this.print('E', infos);
 	}
 	print(level, infos){
-		console.log(`【${level}】`, moment().format("YY-MM-DD HH:mm:ss ms"), infos.join(' '));
+		//console.log(`【${level}】`, moment().format("YY-MM-DD HH:mm:ss ms"), infos.join(' '));
+		console.log(`【${level}】`, `【${moment().format("HH:mm:ss ms")}】`, infos.join(' '));
 	}
 }
 // 事件服务
@@ -104,13 +105,53 @@ class EventService extends BaseService {
 
 // 组件展示，实现新的组件没必要通过继承的方式,渲染除外
 class Component{
-	constructor(){}
+	constructor(){
+		this._serviceCenter = GS.ServiceCenter;
+	}
 	update(gameObj){}
 	destroy(){}
+	//event.<listen/ignore/ignoreAll/trigger>.eventName params
+	event(key, params){
+		let _key = 'event.';
+		_key += key;
+		this._serviceCenter.doService(key, params);
+	}
+	listen({eventName, target, callback}){
+		this.event('listen',{eventName, target, callback});
+	}
+	trigger({eventName, params}){
+		this.event('trigger',{eventName, params});
+	}
+	ignore({eventName, target}){
+		this.event('ignore',{eventName, target});
+	}
+	ignoreScope(target){
+		this.event('ignoreScope',target);
+	}
+	//log.<debug/warn/error> params
+	log(key, params){
+		let _key = 'log.';
+		_key += key;
+		let _params = [this.TAG, ...params];
+		this._serviceCenter.doService(_key, _params);
+	}
+	debug(...params){
+		let key = 'debug';
+		this.log(key, params);
+	}
+	warn(...params){
+		let key = 'warn';
+		this.log(key, params);
+	}
+	error(...params){
+		let key = 'error';
+		this.log(key, params);
+	}
 }
 // 所有渲染相关的Component与这个关联
-class ComponentRenderRoot{
+class ComponentRenderRoot extends Component{
 	constructor(renderRoot){
+		super();
 		this.TAG= 'GS.ComponentRenderRoot';
 		this._isScene = !renderRoot;
 		this._parent = GS.Engine._app.stage;
@@ -124,10 +165,12 @@ class ComponentRenderRoot{
 		this._parent.addChild(this.root);
 	}
 	update(gameObj){
+		super.update(gameObj);
 		this.refreshRender();
 	}
 
 	destroy(){
+		super.destroy();
 		this.root.removeAllChildren();
 		this._parent.removeChild(this.root);
 	}
@@ -139,7 +182,7 @@ class ComponentRenderRoot{
 		this.root.scale.x = this.scale.x;
 		this.root.scale.y = this.scale.y;
 		//TODO: pixi.Container 没有anchor属性
-		this.root.setAnchor(0.5);
+		//this.root.anchor.set(0.5);
 		//this.root.anchor.x = this.anchor.x;
 		//this.root.anchor.y = this.anchor.y;
 	}
@@ -292,10 +335,20 @@ class Engine{
 		this._bgColor = 0x1099bb;
 		this._FPS = 0;
 		this._gameObjects = [];
+		this._config = {
+			width: 800,
+			height: 600,
+			bgColor: 0xff0000,
+		};
 	}
 	init(){
-		this._app = new PIXI.Application(this._size, this._bgColor);
+		this._app = new PIXI.Application(this._config.width, this._config.height, this._config.bgColor);
 		document.body.appendChild(this._app.view);
+	}
+	setConfig(config){
+		this._config = config;
+		this._size = {width: this._config.width, height: this._config.height}
+		this._bgColor = this._config.bgColor;
 	}
 	start(){
 		this.init();
@@ -318,20 +371,22 @@ class Engine{
 	}
 }
 
-window.GS = {};
+let GS = {};
 GS.Component = Component;
 GS.ComponentSprite = SpriteComponent;
 GS.ComponentRenderRoot = ComponentRenderRoot;
 GS.GameObject = GameObject;
 GS.Event = Event;
 
-function initGameSprite(){
+GS.initGameSprite = (conf)=>{
 	GS.Engine = new Engine();
+	GS.Engine.setConfig(conf);
 	// Service
 	GS.ServiceCenter = new ServiceCenter();
 	GS.ServiceCenter.addService('log', new LogService('log'));
 	GS.ServiceCenter.addService('event', new EventService('event'));
 }
-initGameSprite();
-GS.Engine.start();
+if(!(typeof exports === 'undefined')) {
+    exports.GS = GS;
+}
 console.log('Load GameSprite end');
